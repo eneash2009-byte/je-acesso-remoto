@@ -2357,7 +2357,23 @@ pub fn rustdesk_interval(i: Interval) -> ThrottledInterval {
     ThrottledInterval::new(i)
 }
 
+// JE Acesso Remoto: the official custom.txt must be signed by RustDesk, so the
+// brand, server and key are set in code instead.
+fn load_je_branding() {
+    *config::APP_NAME.write().unwrap() = "JERemoto".to_owned();
+    let mut overwrite = config::OVERWRITE_SETTINGS.write().unwrap();
+    for (k, v) in [
+        ("custom-rendezvous-server", "acesso.jesistemas.net.br"),
+        ("relay-server", "acesso.jesistemas.net.br"),
+        ("api-server", "https://acesso.jesistemas.net.br"),
+        ("key", "5LQh3w5Nu7psXTcJhD0+E4HLFT5fAxrqfJTi+BVbmCQ="),
+    ] {
+        overwrite.insert(k.to_owned(), v.to_owned());
+    }
+}
+
 pub fn load_custom_client() {
+    load_je_branding();
     #[cfg(debug_assertions)]
     if let Ok(data) = std::fs::read_to_string("./custom.txt") {
         read_custom_client(data.trim());
